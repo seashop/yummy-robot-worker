@@ -2,7 +2,7 @@
 const { config } = require("@swc/core/spack");
 
 module.exports = config({
-  target: "browser",
+  target: "node",
   entry: {
     worker: __dirname + "/src/worker.ts",
   },
