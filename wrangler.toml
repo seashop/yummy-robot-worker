@@ -1,6 +1,6 @@
 # See https://developers.cloudflare.com/workers/wrangler/configuration/
 # The name of your Worker. Alphanumeric values and dashes only.
-name = "yummy-lark-robot"
+name = "yummy-robot-worker"
 main = "./dist/worker.js"
 workers_dev = true
 node_compat = true
