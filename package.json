@@ -34,10 +34,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.14.1",
+    "@octokit/webhooks-types": "^6.10.0",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.241",
     "@types/node": "^17.0.21",
-    "gitlab-event-types": "^1.0.3",
     "hex-to-array-buffer": "^2.0.0",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",

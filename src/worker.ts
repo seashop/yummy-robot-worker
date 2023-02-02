@@ -1,7 +1,8 @@
 import { createRobot } from "./lark/robot";
 import type { Webhook } from "./lark/types";
-import { handleGitlabWebhook } from "./gitlabHandler";
+import { handleWebhook } from "./github/handlerWebhook";
 import { verifyWebhookEvent } from "./github/sign";
+import type { WebhookEventName } from "@octokit/webhooks-types";
 
 interface WorkerEnv {
   WEBHOOK?: Webhook;
@@ -43,21 +44,28 @@ const fetch: ExportedHandlerFetchHandler<WorkerEnv> = async (
   });
 
   const rawReqPayload = await blob.text();
-  let reqPayload: any = undefined;
+  let payload: any = undefined;
   try {
-    reqPayload = JSON.parse(rawReqPayload);
+    payload = JSON.parse(rawReqPayload);
   } catch {
-    reqPayload = rawReqPayload;
+    payload = rawReqPayload;
   }
 
-  return new Response(
-    JSON.stringify(await handleGitlabWebhook(reqPayload, robot)),
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const ghEvent = request.headers.get("X-GitHub-Event") ?? "";
+  if (ghEvent) {
+    return new Response(
+      JSON.stringify(
+        await handleWebhook(ghEvent as WebhookEventName, payload, robot)
+      ),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+
+  return new Response("no matched event processor", { status: 400 });
 };
 
 const exportedHandler: ExportedHandler<WorkerEnv> = {

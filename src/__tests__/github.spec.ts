@@ -1,7 +1,8 @@
+import type { WebhookEvent } from "@octokit/webhooks-types";
 import { describe, expect, vi, test } from "vitest";
-import { handleGitlabWebhook } from "../gitlabHandler";
+import { handleWebhook } from "../github/handlerWebhook";
 import type { LarkRobot } from "../lark/robot";
-import note from "./fixtures/note.json";
+import payload from "./fixtures/push.json";
 
 describe("gitlab", () => {
   test("should send data match snapshot", async () => {
@@ -11,7 +12,7 @@ describe("gitlab", () => {
         return Promise.resolve({ code: 1, msg: "" });
       }),
     };
-    await handleGitlabWebhook(note, mockRobot);
+    await handleWebhook("push", payload as WebhookEvent, mockRobot);
     expect(mockRobot.send).toBeCalledTimes(1);
   });
 });
