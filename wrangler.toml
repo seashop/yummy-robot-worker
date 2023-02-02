@@ -3,6 +3,7 @@
 name = "yummy-lark-robot"
 main = "./dist/worker.js"
 workers_dev = true
+node_compat = true
 # account_id = ""
 # route = ""
 # usage_model = "bundled"
