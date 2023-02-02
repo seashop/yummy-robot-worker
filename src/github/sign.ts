@@ -1,49 +1,49 @@
-import { readFileSync } from "fs";
-import { createHmac } from "crypto";
+import hexToArrayBuffer from "hex-to-array-buffer";
 
-function jwtDate(date: Date) {
-  return Math.floor(date.getTime() / 1000);
-}
+async function verifybWebhookSignature(
+  secret: string,
+  payload: BufferSource,
+  sign: string
+) {
+  if (!payload) return null;
 
-// Generate JWT for GitHub App.
-// Requires gh_priv_key.pem to be in repo root (i.e. ../..).
-// Requires GITHUB_APP_ID to be in .env
-// Token docs: https://developer.github.com/apps/building-github-apps/authentication-options-for-github-apps/#authenticating-as-a-github-app
-export function generateGitHubToken(ghAppId: string) {
-  const cert = readFileSync("gh_priv_key.pem");
+  const enc = new TextEncoder();
+  const algorithm = { name: "HMAC", hash: "SHA-256" };
 
-  const payload = {
-    iat: jwtDate(new Date()),
-    exp: jwtDate(new Date()) + 100,
-    iss: ghAppId,
-  };
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(secret),
+    algorithm,
+    false,
+    ["sign", "verify"]
+  );
 
-  const options = {
-    algorithm: "RS256",
-  };
+  // const sign = await crypto.subtle.sign(algorithm.name, key, payload)
 
-  // TODO
-  // return jwt.sign(payload, cert, options);
-}
-
-export function signRequestBody(key: string, body: string | null) {
-  if (!body) return null;
-  return `sha1=${createHmac("sha1", key).update(body, "utf8").digest("hex")}`;
+  return await crypto.subtle.verify(
+    algorithm.name,
+    key,
+    hexToArrayBuffer(sign.replace(/^sha256=/, "") ?? ""),
+    payload
+  );
 }
 
 // Verifies authenticity of a webhook event.
 // https://developer.github.com/webhooks/#delivery-headers
-export async function verifyWebhookEvent(request: Request, token: any) {
-  if (typeof token !== "string") {
+export async function verifyWebhookEvent(
+  secret: string,
+  headers: Headers,
+  payload: BufferSource
+) {
+  if (typeof secret !== "string") {
     const errMsg = "Must provide a 'GITHUB_WEBHOOK_SECRET' env variable";
     return { statusCode: 401, body: errMsg };
   }
 
-  const headers = request.headers;
-
-  const sig = headers.get("x-hub-signature") || headers.get("X-Hub-Signature");
+  const sig =
+    headers.get("x-hub-signature-256") || headers.get("X-Hub-Signature-256");
   if (!sig) {
-    const errMsg = "No X-Hub-Signature found on request";
+    const errMsg = "No X-Hub-Signature-256 found on request";
     return { statusCode: 401, body: errMsg };
   }
 
@@ -61,12 +61,10 @@ export async function verifyWebhookEvent(request: Request, token: any) {
     return { statusCode: 401, body: errMsg };
   }
 
-  const event = (await request.json()) as Object;
-
-  const calculatedSig = signRequestBody(token, event.toString());
-  if (sig !== calculatedSig) {
+  const isValid = await verifybWebhookSignature(secret, payload, sig);
+  if (!isValid) {
     const errMsg =
-      "X-Hub-Signature incorrect. Github webhook token doesn't match";
+      "X-Hub-Signature-256 incorrect. Github webhook token doesn't match";
     return { statusCode: 401, body: errMsg };
   }
 

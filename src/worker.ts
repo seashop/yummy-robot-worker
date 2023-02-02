@@ -20,10 +20,17 @@ const fetch: ExportedHandlerFetchHandler<WorkerEnv> = async (
     );
   }
 
+  const blob = await request.blob();
+  const bodyBuffer = await blob.arrayBuffer();
+  if (!bodyBuffer.byteLength) {
+    return new Response("missing request body", { status: 400 });
+  }
+
   if (env.GH_WEBHOOK_SECRET) {
     const verifyResult = await verifyWebhookEvent(
-      request,
-      env.GH_WEBHOOK_SECRET
+      env.GH_WEBHOOK_SECRET,
+      request.headers,
+      bodyBuffer
     );
     if (verifyResult) {
       throw new Error(verifyResult.body);
@@ -35,8 +42,16 @@ const fetch: ExportedHandlerFetchHandler<WorkerEnv> = async (
     signSecret: env.SIGN_SECRET,
   });
 
+  const rawReqPayload = await blob.text();
+  let reqPayload: any = undefined;
+  try {
+    reqPayload = JSON.parse(rawReqPayload);
+  } catch {
+    reqPayload = rawReqPayload;
+  }
+
   return new Response(
-    JSON.stringify(await handleGitlabWebhook(await request.json(), robot)),
+    JSON.stringify(await handleGitlabWebhook(reqPayload, robot)),
     {
       headers: {
         "Content-Type": "application/json",
