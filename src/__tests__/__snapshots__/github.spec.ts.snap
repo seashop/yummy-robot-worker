@@ -1,0 +1,15 @@
+// Vitest Snapshot v1
+
+exports[`gitlab > should send data match snapshot 1`] = `
+[
+  {
+    "content": {
+      "text": "repository: seashop/yummy-robot-worker
+branch : refs/heads/yummy
+committer: xqbumu
+compare: https://github.com/seashop/yummy-robot-worker/compare/91648ad0d860...e218cd90c429",
+    },
+    "msg_type": "text",
+  },
+]
+`;
