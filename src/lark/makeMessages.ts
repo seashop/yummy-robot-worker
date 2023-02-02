@@ -1,4 +1,3 @@
-
 /**
  * See https://open.feishu.cn/tool/cardbuilder?from=howtoguide
  */
@@ -68,17 +67,17 @@ export const makeInteractiveCard = ({
         tag: "action",
       },
     ].filter(Boolean),
-  }
+  };
 
   return {
     msg_type: "interactive" as const,
     card,
-  }
+  };
 };
 
 export const makeText = (text: string) => {
   return {
     msg_type: "text" as const,
     content: { text },
-  }
-}
+  };
+};

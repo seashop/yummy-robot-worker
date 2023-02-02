@@ -19,14 +19,15 @@ export const handleWebhook = async (
   switch (name) {
     case "push":
       e = event as PushEvent;
-      msg = makeText([
-        `repository: ${e.repository.full_name}`,
-        `branch : ${e.ref}`,
-        `committer: ${e.pusher.name}`,
-        `compare: ${e.compare}`,
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      msg = makeText(
+        [
+          `repository: ${e.repository.full_name}`,
+          `branch : ${e.ref}`,
+          `committer: ${e.pusher.name}`,
+          `compare: ${e.compare}`,
+        ]
+          .filter(Boolean)
+          .join("\n")
       );
       break;
     case "workflow_job":
@@ -38,9 +39,11 @@ export const handleWebhook = async (
           .join("\n"),
       });
       break;
-      break;
     default:
-      console.error("Unknown event:", event);
+      msg = makeInteractiveCard({
+        title: `未配置事件`,
+        content: [`事件标识: ${name}`].filter(Boolean).join("\n"),
+      });
       break;
   }
 

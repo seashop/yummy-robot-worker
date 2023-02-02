@@ -170,9 +170,7 @@
       },
       "added": [],
       "removed": [],
-      "modified": [
-        "src/__tests__/fixtures/push.json"
-      ]
+      "modified": ["src/__tests__/fixtures/push.json"]
     }
   ],
   "head_commit": {
@@ -194,8 +192,6 @@
     },
     "added": [],
     "removed": [],
-    "modified": [
-      "src/__tests__/fixtures/push.json"
-    ]
+    "modified": ["src/__tests__/fixtures/push.json"]
   }
 }
