@@ -47,12 +47,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           secrets: |
-            WEBHOOK
-            SIGN_SECRET
+            LARK_WEBHOOK
+            LARK_SIGN_SECRET
             GH_WEBHOOK_SECRET
         env:
-          WEBHOOK: ${{ secrets.WEBHOOK }}
-          SIGN_SECRET: ${{ secrets.SIGN_SECRET }}
+          LARK_WEBHOOK: ${{ secrets.LARK_WEBHOOK }}
+          LARK_SIGN_SECRET: ${{ secrets.LARK_SIGN_SECRET }}
           GH_WEBHOOK_SECRET: ${{ secrets.GH_WEBHOOK_SECRET }}
           # "CF_ACCOUNT_ID"  is deprecated. Please use "CLOUDFLARE_ACCOUNT_ID", instead.
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || secrets.CF_ACCOUNT_ID }}

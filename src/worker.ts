@@ -5,8 +5,8 @@ import { verifyWebhookEvent } from "./github/sign";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 
 interface WorkerEnv {
-  WEBHOOK?: Webhook;
-  SIGN_SECRET?: string;
+  LARK_WEBHOOK?: Webhook;
+  LARK_SIGN_SECRET?: string;
   GH_WEBHOOK_SECRET?: string;
 }
 
@@ -15,7 +15,7 @@ const fetch: ExportedHandlerFetchHandler<WorkerEnv> = async (
   env,
   ctx
 ) => {
-  if (!env.WEBHOOK) {
+  if (!env.LARK_WEBHOOK) {
     throw new Error(
       "Specified secret 'WEBHOOK' not found in environment variables."
     );
@@ -39,8 +39,8 @@ const fetch: ExportedHandlerFetchHandler<WorkerEnv> = async (
   }
 
   const robot = createRobot({
-    webhook: env.WEBHOOK,
-    signSecret: env.SIGN_SECRET,
+    webhook: env.LARK_WEBHOOK,
+    signSecret: env.LARK_SIGN_SECRET,
   });
 
   const rawReqPayload = await blob.text();
